@@ -1,76 +1,85 @@
-class Person:
+class Member:
     instances = []
 
     def __init__(self, name, subject=None):
         self.name = name
         self.subject = subject
-        Person.instances.append(self)
+        Member.instances.append(self)
 
     @classmethod
-    def import_persons(cls, filename):
-        persons = []
+    def import_Members(cls, filename):
+        Members = []
         with open(filename, 'r') as file:
             lines = file.readlines()
             for line in lines:
                 data = line.strip().split(', ')
                 if len(data) == 2:
                     name, subject = data
-                    persons.append(Mitarbeiter(name, subject))
+                    Members.append(Official(name, subject))
                 elif len(data) == 1:
                     name = data[0]
-                    persons.append(Kunde(name))
-        return persons
+                    Members.append(Ordinary(name))
+        return Members
 
     @classmethod
-    def print_person_imports(cls, input_file):
-        persons = cls.import_persons(input_file)
-        for person in persons:
-            if isinstance(person, Mitarbeiter):
-                print(f"Name: {person.name}, Subject: {person.subject}")
+    def print_Member_imports(cls, input_file):
+        Members = cls.import_Members(input_file)
+        for Member in Members:
+            if isinstance(Member, Official):
+                print(f"Name: {Member.name}, Subject: {Member.subject}")
             else:
-                print(f"Name: {person.name}")
+                print(f"Name: {Member.name}")
 
     @classmethod
-    def add_person(cls, class_name, name, subject=None):
-        person = class_name(name, subject) if subject else class_name(name)
-        cls.instances.append(person)
+    def add_Member(cls, class_name, name, subject=None):
+        Member = class_name(name, subject) if subject else class_name(name)
+        cls.instances.append(Member)
         print(f"{class_name.__name__}: {name} added.") 
         for i in cls.instances:
             print(i)
             
-        return person
+        return Member
 
     @classmethod
-    def export_person_to_new_file(cls, filename, data):
+    def del_Member(cls, name):
+        for instance in cls.instances:
+            if instance.name == name:
+                cls.instances.remove(instance)
+                print(f"Member {name} deleted succesfully.")
+                return
+        print(f"Member {name} not found.")
+
+    @classmethod
+    def export_Member_to_new_file(cls, filename, data):
         with open(filename, 'w', newline="") as file:
-            for person in data:
-                if isinstance(person, Mitarbeiter):
-                    file.write(f"{person.name}, {person.subject}\n")
+            for Member in data:
+                if isinstance(Member, Official):
+                    file.write(f"{Member.name}, {Member.subject}\n")
                 else:
-                    file.write(f"{person.name}\n")
+                    file.write(f"{Member.name}\n")
 
     @classmethod
-    def export_person_append(cls, filename, data):
+    def export_Member_append(cls, filename, data):
         with open(filename, 'a', newline="") as file:
-            for person in data:
-                if isinstance(person, Mitarbeiter):
-                    file.write(f"{person.name}, {person.subject}\n")
+            for Member in data:
+                if isinstance(Member, Official):
+                    file.write(f"{Member.name}, {Member.subject}\n")
                 else:
-                    file.write(f"{person.name}\n")
+                    file.write(f"{Member.name}\n")
 
     @classmethod
-    def filter_person(cls, names, persons):
-        for person in persons:
-            if person in names:
-                print(person)
+    def filter_Member(cls, names, Members):
+        for Member in Members:
+            if Member in names:
+                print(Member)
 
 
-class Mitarbeiter(Person):
+class Official(Member):
     def __init__(self, name, subject):
         super().__init__(name, subject)
 
 
-class Kunde(Person):
+class Ordinary(Member):
     def __init__(self, name):
         super().__init__(name)
 
