@@ -19,25 +19,34 @@ def button_add_Member(class_name, name, subject=None):
 # class method call del_Member
 def button_del_Member(class_name, name, subject=None):
     try:
-        if class_name == Official:
+        if class_name == 'Official':
             member = Member.del_Member(Official, name, subject)
-        elif class_name == Ordinary:
+        elif class_name == 'Ordinary':
             member = Member.del_Member(Ordinary, name)
         messagebox.showinfo("Success", f"deleted {class_name}: {name}.")
 
     except Exception as e:
         messagebox.showerror("Error", f"failed due to {e}")
 
-def button_import(file):
+# method call to import export functions
+def button_import_export(file, action):
     try:
-        Member.import_Members(file)
-        Member.print_Member_imports(file)
-        messagebox.showinfo("Success imported: {Member.name}")
+        if action == 'import':
+            Member.import_Members(file)
+            Member.print_Member_imports(file)
+            messagebox.showinfo("Success", f"imported: {Member.name}")
+        elif action == 'export':
+            Member.export_Member_to_new_file(file, Member.instances)
+            messagebox.showinfo("Success", f"members exported")
+        elif action == 'export append':
+            Member.export_Member_append(file, Member.instances)
+            messagebox.showinfo("Success", f"members appended")
+
     except Exception as e:
         messagebox.showerror("Error", f"failed due to {e}")
         
 def button_interface():
-    new_window = tk.Toplevel(root)
+    new_window = tk.Toplevel()
     new_window.title("Add new object Dialogue")
     new_window.geometry("500x309")
 
@@ -81,25 +90,38 @@ def button_interface():
 
 # import/export interface
 
+# code option menu with single input line for import and export
 def button_export_options_interface():
     new_window = tk.Tk()
     new_window.title("import/export dialogue")
     new_window.geometry("500x309")
 
-    import_file_label = ttk.Label(new_window, text="File location:")
-    import_file_label.grid(row=0, column=0, padx=5, pady=5)
-    import_file_entry = ttk.Entry(new_window, width=35)
-    import_file_entry.grid(row=0, column=1, padx=5, pady=5)
+    options_list = ["import", "export", "export append"] 
 
-    export_file_label = ttk.Label(new_window, text="File location:")
-    export_file_label.grid(row=1, column=0, padx=5, pady=5)
-    export_file_entry = ttk.Entry(new_window, width=35)
-    export_file_entry.grid(row=1, column=1, padx=5, pady=5)
+    # Variable to keep track of the option 
+    # selected in OptionMenu 
+    value_inside = tk.StringVar(new_window) 
+    
+    # Set the default value of the variable 
+    value_inside.set("Select an Option") 
+    
+    # Create the optionmenu widget and passing  
+    # the options_list and value_inside to it. 
+    question_menu = tk.OptionMenu(new_window, value_inside, *options_list) 
+    question_menu.grid(row=1, column=0, padx=5, pady=5)
+
+    file_label = ttk.Label(new_window, text="File location:")
+    file_label.grid(row=1, column=0, padx=5, pady=5)
+    file_entry = ttk.Entry(new_window, width=35)
+    file_entry.grid(row=1, column=1, padx=5, pady=5)
 
     def button_confirm_import():
-        file = import_file_entry.get()
-        button_import(file)
+        file = file_entry.get()
+        action = value_inside.get()
+        button_import_export(file, action)
 
+    button_confirm_import = ttk.Button(new_window, text="OK", command=button_confirm_import)
+    button_confirm_import.grid(row=2, column=0, padx=5, pady=5)
 # Main Tkinter Window
 
 root = tk.Tk()
